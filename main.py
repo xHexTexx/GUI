@@ -6,7 +6,7 @@ from PIL import Image,ImageTk
 import pandas as pd
 import numpy as np
 
-file = open(r'C:\Users\hp\Documents\GitHub\GUI\periodic table.csv')
+file = open(r'periodic table.csv')
 csv_reader = pd.read_csv(file, delimiter=',')
 element = np.array(csv_reader['Element'])
 weight = np.array(csv_reader['Weight'])
@@ -23,6 +23,11 @@ class App(tk.Tk):
         self['bg'] = "#E9DAC1"
         self.molarmass = 0.0
         self.vpermol = 0.0
+        self.reactant_entry = []
+        self.product_entry = []
+        self.reactant_data = []
+        self.product_data = []
+
 
 class page_button(ttk.Button) :
 
@@ -38,6 +43,71 @@ class page_entry(ttk.Entry) :
 
     def __init__(self, *args, **kwargs):
         Entry.__init__(self, *args, **kwargs)
+
+class group_entry_reactant:
+
+    def __init__(self , parent , id, *args, **kwargs):
+        self.id = id
+
+        self.data = {
+            "name" : "",
+            "amount" : "",
+            "unit1" : "" ,
+            "unit2" : ""
+        }
+
+        def fill_unit1(event):
+
+            if (rxt_type.get() == 'mass'):
+                rxt_unit['values'] = ['gram(g)', 'kilogram(kg)']
+            elif (rxt_type.get() == 'particle'):
+                rxt_unit['values'] = ['atom', 'molecule']
+            elif (rxt_type.get() == 'volumn at STP' or rxt_type.get() == 'volumn(custom)'):
+                rxt_unit['values'] = ['dm^3', 'cm^3']
+
+        def callback():
+            self.data["name"] = reactant.get()
+            print(self.data["name"])
+            return True
+
+        reactant = ttk.Entry(parent, width=11 , validate="focusout", validatecommand=callback)
+        rxt_dt = ttk.Entry(parent, width=4)
+
+        rxt_type = ttk.Combobox(parent,values=['mass', 'particle', 'volumn at STP', 'volumn(custom)'],width=1, state="readonly")
+        rxt_unit = ttk.Combobox(parent, values='', width=1, state="readonly")
+        reactant.place(x=135 + (100 * id), y=100)
+        rxt_type.place(x=115 + (100 * id), y=125)
+        rxt_dt.place(x=145.5 + (100 * id), y=125)
+        rxt_unit.place(x=177.5 + (100 * id), y=125)
+        rxt_type.bind('<<ComboboxSelected>>', fill_unit1)
+        reactant_text = tk.Label(parent, text="reactants :")
+        product_text = tk.Label(parent, text="products :")
+        reactant_text.place(x=45, y=97.5)
+        product_text.place(x=45, y=297.5)
+
+class group_entry_product:
+
+    def __init__(self , parent , id, *args, **kwargs):
+        self.id = id
+
+        def fill_unit2(event) :
+            if(pro_type.get() == 'mass') :
+                pro_unit['values'] = ['gram(g)', 'kilogram(kg)']
+            elif(pro_type.get() == 'particle') :
+                pro_unit['values'] = ['atom', 'molecule']
+            elif(pro_type.get() == 'volumn at STP' or pro_type.get() == 'volumn(custom)') :
+                pro_unit['values'] = ['dm^3', 'cm^3']
+
+        product = ttk.Entry(parent, width=11)
+        pro_type = ttk.Combobox(parent, values=['mass', 'particle', 'volumn at STP', 'volumn(custom)'], width=1,
+                                state="readonly")
+        pro_dt = ttk.Entry(parent, width=4)
+        pro_unit = ttk.Combobox(parent, values=[], width=1, state="readonly")
+        product.place(x=135 + (100 * id), y=300)
+        pro_type.place(x=115 + (100 * id), y=325)
+        pro_dt.place(x=145.5 + (100 * id), y=325)
+        pro_unit.place(x=177.5 + (100 * id), y=325)
+        pro_type.bind('<<ComboboxSelected>>', fill_unit2)
 
 def page1 ():
 
@@ -256,14 +326,53 @@ def page1 ():
     page1.mainloop()
 
 def page2 ():
+
+    def create ( ):
+
+        n_reactant = int(n_of_reactant.get())
+        n_product = int(n_of_product.get())
+
+        page2.reactant_entry = [group_entry_reactant(page2 , i) for i in range(n_reactant)]
+        page2.product_entry = [group_entry_product(page2 , i) for i in range(n_product)]
+
+    def get_data ():
+        n_reactant = int(n_of_reactant.get())
+        n_product = int(n_of_product.get())
+
+
     page2 = App()
+
     #-------------------------------
     page2.geometry("750x450+50+50")
     page2.resizable(False, False)
     page2.title("Analytical Helper")
     page2.iconbitmap(r'Project/Logic/443525.ico')
 
+    # reactant
+    enter_n_of_reactant = page_label(page2, text="number of reactant :", font=("Kanit", 10))
+    enter_n_of_reactant.place(x=100, y=50)
+    n_of_reactant = ttk.Spinbox(page2, from_=1, to=6, wrap=True, width=3)
+    n_of_reactant.place(x=245, y=55)
 
+    # product
+    enter_n_of_product = page_label(page2, text="number of product :", font=("Kanit", 10))
+    enter_n_of_product.place(x=325, y=50)
+    n_of_product = ttk.Spinbox(page2, from_=1, to=6, wrap=True, width=3)
+    n_of_product.place(x=465, y=55)
+
+    # command
+    balance_button = ttk.Button(page2, text='balance')
+    balance_button.place(x=315, y=200)
+
+    calculate_button = ttk.Button(page2, text='calculate')
+    calculate_button.place(x=420, y=200)
+
+    # command
+    confirm_button = ttk.Button(page2, text='submit', command = create )
+    confirm_button.pack(ipadx=5, ipady=5, expand=True)
+    confirm_button.place(x=525, y=52.5)
+    clear_button = ttk.Button(page2, text='clear')
+    clear_button.place(x=605, y=52.5)
 
     page2.mainloop()
 
