@@ -1,0 +1,5 @@
+import csv
+file = open(r'C:\Users\Admin\Documents\Coding\Project\periodic data.csv')
+csv_reader = csv.reader(file, delimiter=',')
+for row in csv_reader:
+  print(row)
