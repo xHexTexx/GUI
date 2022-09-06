@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import *
 from Compound_converter import Compound_converter as ccv
 from PIL import Image,ImageTk
+from balanced_equation import balance
 import pandas as pd
 import numpy as np
 
@@ -49,41 +50,34 @@ class group_entry_reactant:
     def __init__(self , parent , id, *args, **kwargs):
         self.id = id
 
-        self.data = {
-            "name" : "",
-            "amount" : "",
-            "unit1" : "" ,
-            "unit2" : ""
-        }
-
         def fill_unit1(event):
 
-            if (rxt_type.get() == 'mass'):
-                rxt_unit['values'] = ['gram(g)', 'kilogram(kg)']
-            elif (rxt_type.get() == 'particle'):
-                rxt_unit['values'] = ['atom', 'molecule']
-            elif (rxt_type.get() == 'volumn at STP' or rxt_type.get() == 'volumn(custom)'):
-                rxt_unit['values'] = ['dm^3', 'cm^3']
+            if (self.rxt_type.get() == 'mass'):
+                self.rxt_unit['values'] = ['gram(g)', 'kilogram(kg)']
+            elif (self.rxt_type.get() == 'particle'):
+                self.rxt_unit['values'] = ['atom', 'molecule']
+            elif (self.rxt_type.get() == 'volumn at STP' or self.rxt_type.get() == 'volumn(custom)'):
+                self.rxt_unit['values'] = ['dm^3', 'cm^3']
 
-        def callback():
-            self.data["name"] = reactant.get()
-            print(self.data["name"])
-            return True
+        self.bl1 = ttk.Entry(parent, width=2 )
+        self.bl1.place(x=115 + (100 * id), y=100)
 
-        reactant = ttk.Entry(parent, width=11 , validate="focusout", validatecommand=callback)
-        rxt_dt = ttk.Entry(parent, width=4)
 
-        rxt_type = ttk.Combobox(parent,values=['mass', 'particle', 'volumn at STP', 'volumn(custom)'],width=1, state="readonly")
-        rxt_unit = ttk.Combobox(parent, values='', width=1, state="readonly")
-        reactant.place(x=135 + (100 * id), y=100)
-        rxt_type.place(x=115 + (100 * id), y=125)
-        rxt_dt.place(x=145.5 + (100 * id), y=125)
-        rxt_unit.place(x=177.5 + (100 * id), y=125)
-        rxt_type.bind('<<ComboboxSelected>>', fill_unit1)
-        reactant_text = tk.Label(parent, text="reactants :")
-        product_text = tk.Label(parent, text="products :")
-        reactant_text.place(x=45, y=97.5)
-        product_text.place(x=45, y=297.5)
+        self.reactant = ttk.Entry(parent, width=11)
+        self.rxt_dt = ttk.Entry(parent, width=4)
+
+        self.rxt_type = ttk.Combobox(parent, values=['mass', 'particle', 'volumn at STP', 'volumn(custom)'],width=1, state="readonly"  )
+        self.rxt_unit = ttk.Combobox(parent, values='', width=1, state="readonly")
+
+        self.reactant.place(x=135 + (100 * id), y=100)
+        self.rxt_type.place(x=115 + (100 * id), y=125)
+        self.rxt_dt.place(x=145.5 + (100 * id), y=125)
+        self.rxt_unit.place(x=177.5 + (100 * id), y=125)
+        self.rxt_type.bind('<<ComboboxSelected>>', fill_unit1)
+        self.reactant_text = tk.Label(parent, text="reactants :")
+        self.product_text = tk.Label(parent, text="products :")
+        self.reactant_text.place(x=45, y=97.5)
+        self.product_text.place(x=45, y=297.5)
 
 class group_entry_product:
 
@@ -91,23 +85,26 @@ class group_entry_product:
         self.id = id
 
         def fill_unit2(event) :
-            if(pro_type.get() == 'mass') :
-                pro_unit['values'] = ['gram(g)', 'kilogram(kg)']
-            elif(pro_type.get() == 'particle') :
-                pro_unit['values'] = ['atom', 'molecule']
-            elif(pro_type.get() == 'volumn at STP' or pro_type.get() == 'volumn(custom)') :
-                pro_unit['values'] = ['dm^3', 'cm^3']
+            if(self.pro_type.get() == 'mass') :
+                self.pro_unit['values'] = ['gram(g)', 'kilogram(kg)']
+            elif(self.pro_type.get() == 'particle') :
+                self.pro_unit['values'] = ['atom', 'molecule']
+            elif(self.pro_type.get() == 'volumn at STP' or self.pro_type.get() == 'volumn(custom)') :
+                self.pro_unit['values'] = ['dm^3', 'cm^3']
 
-        product = ttk.Entry(parent, width=11)
-        pro_type = ttk.Combobox(parent, values=['mass', 'particle', 'volumn at STP', 'volumn(custom)'], width=1,
-                                state="readonly")
-        pro_dt = ttk.Entry(parent, width=4)
-        pro_unit = ttk.Combobox(parent, values=[], width=1, state="readonly")
-        product.place(x=135 + (100 * id), y=300)
-        pro_type.place(x=115 + (100 * id), y=325)
-        pro_dt.place(x=145.5 + (100 * id), y=325)
-        pro_unit.place(x=177.5 + (100 * id), y=325)
-        pro_type.bind('<<ComboboxSelected>>', fill_unit2)
+        self.bl2 = ttk.Entry(parent, width=2)
+        self.bl2.place(x=115 + (100 * id), y=300)
+
+        self.product = ttk.Entry(parent, width=11)
+        self.pro_dt = ttk.Entry(parent, width=4)
+        self.pro_type = ttk.Combobox(parent, values=['mass', 'particle', 'volumn at STP', 'volumn(custom)'], width=1,state="readonly")
+        self.pro_unit = ttk.Combobox(parent, values=[], width=1, state="readonly")
+
+        self.product.place(x=135 + (100 * id), y=300)
+        self.pro_type.place(x=115 + (100 * id), y=325)
+        self.pro_dt.place(x=145.5 + (100 * id), y=325)
+        self.pro_unit.place(x=177.5 + (100 * id), y=325)
+        self.pro_type.bind('<<ComboboxSelected>>', fill_unit2)
 
 def page1 ():
 
@@ -336,8 +333,57 @@ def page2 ():
         page2.product_entry = [group_entry_product(page2 , i) for i in range(n_product)]
 
     def get_data ():
+
         n_reactant = int(n_of_reactant.get())
         n_product = int(n_of_product.get())
+
+        data = {
+            "name": "-",
+            "amount": "-",
+            "unit1": "-",
+            "unit2": "-"
+        }
+        page2.reactant_data = []
+        page2.product_data = []
+
+        for i in range(n_reactant) :
+            temp = dict(data)
+            temp["name"] = page2.reactant_entry[i].reactant.get()
+            temp["amount"] = int(page2.reactant_entry[i].rxt_dt.get())
+            temp["unit1"] = page2.reactant_entry[i].rxt_unit.get()
+            temp["unit2"] = page2.reactant_entry[i].rxt_type.get()
+            page2.reactant_data.append(temp)
+
+        for dt in page2.reactant_data :
+            print(dt["name"] , dt["amount"] , dt["unit1"] , dt["unit2"])
+
+        for i in range(n_product):
+            temp = dict(data)
+            temp["name"] = page2.product_entry[i].product.get()
+            temp["amount"] = int(page2.product_entry[i].pro_dt.get())
+            temp["unit1"] = page2.product_entry[i].pro_unit.get()
+            temp["unit2"] = page2.product_entry[i].pro_type.get()
+            page2.product_data.append(temp)
+
+        for dt in page2.product_data:
+            print(dt["name"], dt["amount"], dt["unit1"], dt["unit2"])
+
+        reactants = [page2.reactant_data[i]['name'] for i in range(n_reactant)]
+        products = [page2.product_data[i]['name'] for i in range(n_reactant)]
+
+        print(reactants)
+        print(products)
+
+        coefficients = balance(reactants , products)
+
+        for i in range(n_reactant) :
+            page2.reactant_entry[i].bl1.delete(0, 'end')
+            page2.reactant_entry[i].bl1.insert(0 , coefficients[i][0])
+
+        for i in range(n_product) :
+            page2.product_entry[i].bl2.delete(0 , 'end')
+            page2.product_entry[i].bl2.insert(0 , coefficients[i + n_reactant][0])
+
 
 
     page2 = App()
@@ -361,7 +407,7 @@ def page2 ():
     n_of_product.place(x=465, y=55)
 
     # command
-    balance_button = ttk.Button(page2, text='balance')
+    balance_button = ttk.Button(page2, text='balance', command = get_data )
     balance_button.place(x=315, y=200)
 
     calculate_button = ttk.Button(page2, text='calculate')
@@ -377,6 +423,7 @@ def page2 ():
     page2.mainloop()
 
 if __name__ == "__main__":
+
     app = App()
 
     enter_icon = Image.open(r"Project/Logic/enter_logo.png")
